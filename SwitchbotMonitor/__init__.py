@@ -12,7 +12,7 @@ import azure.monitor.ingestion as azlog
 import azure.core
 from azure.identity import DefaultAzureCredential
 
-sb_base_url = 'https://api.switch-bot.com/v1.1/'
+sb_base_url = 'https://api.switch-bot.com/v1.1'
 
 # make signature for SwitchBot API 1.1
 def sb_make_sign(token: str, secret: str):
