@@ -12,11 +12,9 @@ import azure.monitor.ingestion as azlog
 import azure.core
 from azure.identity import DefaultAzureCredential
 
-base_url = 'https://api.switch-bot.com'
+sb_base_url = 'https://api.switch-bot.com/v1.1/'
 
 # make signature for SwitchBot API 1.1
-
-
 def sb_make_sign(token: str, secret: str):
     nonce = ''
     t = int(round(time.time() * 1000))
@@ -27,8 +25,6 @@ def sb_make_sign(token: str, secret: str):
     return sign, str(t), nonce
 
 # make request header for SwitchBot API 1.1
-
-
 def sb_make_request_header(token: str, secret: str) -> dict:
     sign, t, nonce = sb_make_sign(token, secret)
     headers = {
@@ -40,8 +36,6 @@ def sb_make_request_header(token: str, secret: str) -> dict:
     return headers
 
 # GET request for SwitchBot API 1.1
-
-
 def get_switchbot(url: str, headers):
     try:
         res = requests.get(url, headers=headers)
@@ -53,8 +47,6 @@ def get_switchbot(url: str, headers):
     return json.loads(res.text)
 
 # main routine
-
-
 def main(mytimer: func.TimerRequest) -> None:
     utc_timestamp = datetime.datetime.utcnow().replace(
         tzinfo=datetime.timezone.utc).isoformat()
@@ -74,16 +66,14 @@ def main(mytimer: func.TimerRequest) -> None:
     token = os.environ['SWITCHBOT_TOKEN']
     secret = os.environ['SWITCHBOT_SECRET']
     headers = sb_make_request_header(token, secret)
-    list = get_switchbot(base_url + '/v1.1/devices', headers)
+    list = get_switchbot(sb_base_url + '/devices', headers)
 
     # get device list
     log_body = []
     for row in list['body']['deviceList']:
         # only 'Meter'
         if row['deviceType'] == 'Meter':
-            status = get_switchbot(
-                base_url + "/v1.1/devices/" + row['deviceId'] + "/status", headers)
-
+            status = get_switchbot(sb_base_url + "/devices/" + row['deviceId'] + "/status", headers)
             dt_now = datetime.datetime.now()
 
             out = {}
